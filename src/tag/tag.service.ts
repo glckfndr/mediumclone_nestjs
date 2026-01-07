@@ -4,6 +4,6 @@ import { Injectable } from '@nestjs/common';
 export class TagService {
   // Define your service methods here
   findAll(): string[] {
-    return ['nestjs', 'typescript', 'backend'];
+    return ['nestjs', 'typescript', 'backend', 'api', 'html'];
   }
 }
