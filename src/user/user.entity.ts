@@ -7,6 +7,9 @@ export class UserEntity {
   id: number;
 
   @Column()
+  username: string;
+
+  @Column()
   email: string;
 
   @Column({ default: '' })
@@ -18,8 +21,8 @@ export class UserEntity {
   @Column()
   password: string;
   @BeforeInsert()
-  async hashPassword() {
+  async hashPassword(): Promise<void> {
     // Logic to hash the password before inserting into the database
-    this.password = await hash(this.password, 10);
+    this.password = (await hash(this.password, 10)) as string;
   }
 }
