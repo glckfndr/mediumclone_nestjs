@@ -9,6 +9,7 @@ import { UserService } from '@app/user/user.service';
 import { CreateUserDto } from '@app/user/dto/createUserDto';
 
 import { UserResponseInterface } from '@app/types/userResponse.interface';
+import { LoginUserDto } from '@app/user/dto/LoginUserDto';
 
 @Controller()
 export class UserController {
@@ -20,6 +21,13 @@ export class UserController {
     @Body('user') createUserDto: CreateUserDto,
   ): Promise<UserResponseInterface> {
     const user = await this.userService.createUser(createUserDto);
+    return this.userService.buildUserResponse(user);
+  }
+  @Post('login')
+  async loginUser(
+    @Body('user') loginUserDto: LoginUserDto,
+  ): Promise<UserResponseInterface> {
+    const user = await this.userService.loginUser(loginUserDto);
     return this.userService.buildUserResponse(user);
   }
 }
