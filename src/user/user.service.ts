@@ -50,7 +50,7 @@ export class UserService {
   }
 
   buildUserResponse(user: UserEntity): UserResponseInterface {
-    console.log('Building user response for:', user);
+    //console.log('Building user response for:', user);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...userWithoutPassword } = user;
     return {
@@ -84,5 +84,10 @@ export class UserService {
     }
 
     return user;
+  }
+
+  async findById(id: number): Promise<UserEntity | null> {
+    // Logic to find a user by ID
+    return await this.userRepository.findOne({ where: { id } });
   }
 }
