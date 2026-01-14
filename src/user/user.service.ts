@@ -1,13 +1,14 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Repository } from 'typeorm';
+import { sign } from 'jsonwebtoken';
+import { compare } from 'bcrypt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from '@app/user/dto/createUserDto';
 import { UserEntity } from '@app/user/user.entity';
-import { Repository } from 'typeorm';
-import { sign } from 'jsonwebtoken';
 import { JWT_SECRET } from '@app/config';
 import { UserResponseInterface } from '@app/types/userResponse.interface';
 import { LoginUserDto } from '@app/user/dto/LoginUserDto';
-import { compare } from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -32,10 +33,8 @@ export class UserService {
     }
     const newUser = new UserEntity();
     Object.assign(newUser, createUserDto);
-    // Here you would typically save the newUser to the database
-    console.log('User created:', newUser);
-
-    return await this.userRepository.save(newUser);
+    const savedUser = await this.userRepository.save(newUser);
+    return savedUser;
   }
 
   private generateJwt(user: UserEntity): string {
@@ -52,9 +51,11 @@ export class UserService {
 
   buildUserResponse(user: UserEntity): UserResponseInterface {
     console.log('Building user response for:', user);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, ...userWithoutPassword } = user;
     return {
       user: {
-        ...user,
+        ...userWithoutPassword,
         token: this.generateJwt(user),
       },
     };
@@ -63,6 +64,7 @@ export class UserService {
     // Logic to authenticate a user
     const user = await this.userRepository.findOne({
       where: { email: loginUserDto.email },
+      select: ['id', 'username', 'email', 'password', 'bio', 'image'],
     });
     if (!user) {
       throw new HttpException(
@@ -70,10 +72,10 @@ export class UserService {
         HttpStatus.UNPROCESSABLE_ENTITY,
       );
     }
-    const isPasswordCorrect: boolean = await compare(
+    const isPasswordCorrect = (await compare(
       loginUserDto.password,
       user.password,
-    );
+    )) as boolean;
     if (!isPasswordCorrect) {
       throw new HttpException(
         'Invalid email or password',
