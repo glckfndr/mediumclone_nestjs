@@ -7,9 +7,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from '@app/user/dto/createUserDto';
 import { UserEntity } from '@app/user/user.entity';
 import { JWT_SECRET } from '@app/config';
-import { UserResponseInterface } from '@app/types/userResponse.interface';
+import { UserResponseInterface } from '@app/user/types/userResponse.interface';
 import { LoginUserDto } from '@app/user/dto/LoginUserDto';
-import { UpdateUserDto } from './dto/updateUserDto';
+import { UpdateUserDto } from '@app/user/dto/updateUserDto';
 
 @Injectable()
 export class UserService {

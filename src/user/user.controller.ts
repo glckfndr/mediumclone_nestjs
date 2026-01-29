@@ -12,13 +12,13 @@ import type { Request } from 'express';
 import { UserService } from '@app/user/user.service';
 import { CreateUserDto } from '@app/user/dto/createUserDto';
 
-import type { UserResponseInterface } from '@app/types/userResponse.interface';
+import type { UserResponseInterface } from '@app/user/types/userResponse.interface';
 import { LoginUserDto } from '@app/user/dto/LoginUserDto';
 
 import { User } from '@app/decorators/user.decorator';
-import { UserEntity } from './user.entity';
-import { AuthGuard } from './guards/auth.guard';
-import { UpdateUserDto } from './dto/updateUserDto';
+import { UserEntity } from '@app/user/user.entity';
+import { AuthGuard } from '@app/user/guards/auth.guard';
+import { UpdateUserDto } from '@app/user/dto/updateUserDto';
 
 @Controller()
 export class UserController {
