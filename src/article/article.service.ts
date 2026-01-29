@@ -42,6 +42,14 @@ export class ArticleService {
     };
   }
 
+  async findArticleBySlug(slug: string): Promise<ArticleEntity> {
+    const article = await this.articleRepository.findOne({ where: { slug } });
+    if (!article) {
+      throw new Error('Article not found');
+    }
+    return article;
+  }
+
   findAllArticles() {
     return 'Find All Articles';
   }
