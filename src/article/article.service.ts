@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateArticleDto } from './dto/createArticleDto';
 import { ArticleEntity } from '@app/article/article.entity';
-import { DataSource, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from '@app/user/user.entity';
 import { ArticleResponseInterface } from '@app/article/types/articleResponse.interface';
@@ -16,8 +16,6 @@ export class ArticleService {
   constructor(
     @InjectRepository(ArticleEntity)
     private readonly articleRepository: Repository<ArticleEntity>,
-
-    private readonly dataSource: DataSource,
   ) {}
 
   createArticle(
@@ -92,8 +90,7 @@ export class ArticleService {
     currentUserId: number,
     query: any,
   ): Promise<ArticlesResponseInterface> {
-    const queryBuilder = this.dataSource
-      .getRepository(ArticleEntity)
+    const queryBuilder = this.articleRepository
       .createQueryBuilder('articles')
       .leftJoinAndSelect('articles.author', 'author');
     const articles = await queryBuilder.getMany();
