@@ -10,6 +10,7 @@ import { DeleteResult } from 'typeorm/browser';
 import { UpdateArticleDto } from '@app/article/dto/updateArticleDto';
 
 import { ArticlesResponseInterface } from './types/articlesResponse.interface';
+import { FindAllArticlesQueryInterface } from './types/findAllArticles.query';
 
 @Injectable()
 export class ArticleService {
@@ -88,13 +89,35 @@ export class ArticleService {
 
   async findAllArticles(
     currentUserId: number,
-    query: any,
+    query: FindAllArticlesQueryInterface,
   ): Promise<ArticlesResponseInterface> {
     const queryBuilder = this.articleRepository
       .createQueryBuilder('articles')
       .leftJoinAndSelect('articles.author', 'author');
-    const articles = await queryBuilder.getMany();
+
+    if (query.tag) {
+      queryBuilder.andWhere('articles.tagList LIKE :tag', {
+        tag: `%${query.tag}%`,
+      });
+    }
+
+    if (query.author) {
+      queryBuilder.andWhere('author.username = :username', {
+        username: query.author,
+      });
+    }
+
+    queryBuilder.orderBy('articles.createdAt', 'DESC');
     const articlesCount = await queryBuilder.getCount();
+    if (query.limit) {
+      queryBuilder.limit(query.limit);
+    }
+    if (query.offset) {
+      queryBuilder.offset(query.offset);
+    }
+
+    const articles = await queryBuilder.getMany();
+
     return { articles, articlesCount };
   }
 }
