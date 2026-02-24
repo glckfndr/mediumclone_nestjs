@@ -77,4 +77,17 @@ export class ArticleController {
   ): Promise<ArticlesResponseInterface> {
     return await this.articleService.findAllArticles(currentUserId, query);
   }
+
+  @Post(':slug/favorite')
+  @UseGuards(AuthGuard)
+  async addArticleToFavorites(
+    @Param('slug') slug: string,
+    @User('id') userId: number,
+  ): Promise<ArticleResponseInterface> {
+    const article = await this.articleService.addArticleToFavorites(
+      slug,
+      userId,
+    );
+    return this.articleService.buildArticleResponse(article);
+  }
 }

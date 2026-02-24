@@ -120,4 +120,29 @@ export class ArticleService {
 
     return { articles, articlesCount };
   }
+
+  async addArticleToFavorites(
+    slug: string,
+    userId: number,
+  ): Promise<ArticleEntity> {
+    const article = await this.findArticleBySlug(slug);
+    const user = await this.articleRepository.manager.findOne(UserEntity, {
+      where: { id: userId },
+      relations: ['favorites'],
+    });
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+    const isNotFavorited = !user.favorites.some(
+      (favorite) => favorite.id === article.id,
+    );
+    if (isNotFavorited) {
+      user.favorites.push(article);
+      article.favoritesCount++;
+      await this.articleRepository.manager.save(user);
+      await this.articleRepository.save(article);
+    }
+
+    return article;
+  }
 }
