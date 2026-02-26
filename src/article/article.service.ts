@@ -116,6 +116,24 @@ export class ArticleService {
       queryBuilder.offset(query.offset);
     }
 
+    if (query.favorited) {
+      const author = await this.articleRepository.manager.findOne(UserEntity, {
+        where: { username: query.favorited },
+        relations: ['favorites'],
+      });
+
+      if (!author) {
+        queryBuilder.andWhere('1 = 0'); // No articles found for the favorited user
+      } else {
+        const ids = author.favorites.map((favorite) => favorite.id);
+        if (ids.length > 0) {
+          queryBuilder.andWhere('articles.id IN (:...ids)', { ids });
+        } else {
+          queryBuilder.andWhere('1 = 0'); // No articles found for the favorited user
+        }
+      }
+    }
+
     const articles = await queryBuilder.getMany();
 
     return { articles, articlesCount };

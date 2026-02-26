@@ -3,4 +3,5 @@ export interface FindAllArticlesQueryInterface {
   author?: string;
   limit?: number;
   offset?: number;
+  favorited?: string;
 }
