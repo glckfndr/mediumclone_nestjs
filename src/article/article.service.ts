@@ -134,9 +134,29 @@ export class ArticleService {
       }
     }
 
-    const articles = await queryBuilder.getMany();
+    let favoriteIds: number[] = [];
+    if (currentUserId) {
+      const currentUser = await this.articleRepository.manager.findOne(
+        UserEntity,
+        {
+          where: { id: currentUserId },
+          relations: ['favorites'],
+        },
+      );
+      if (currentUser) {
+        favoriteIds = currentUser.favorites.map((favorite) => favorite.id);
+      }
+    }
 
-    return { articles, articlesCount };
+    const articles = await queryBuilder.getMany();
+    const articlesWithFavorites = articles.map((article) => {
+      return {
+        ...article,
+        favorited: favoriteIds.includes(article.id),
+      };
+    });
+
+    return { articles: articlesWithFavorites, articlesCount };
   }
 
   async addArticleToFavorites(
